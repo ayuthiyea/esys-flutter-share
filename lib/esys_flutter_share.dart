@@ -8,19 +8,25 @@ class Share {
   static const MethodChannel _channel = const MethodChannel(
       'channel:github.com/orgs/esysberlin/esys-flutter-share');
 
+  static const EventChannel _eventChannel = const EventChannel(
+    'channel:github.com/orgs/esysberlin/esys-flutter-share-result'); 
+
   /// Sends a text to other apps.
-  static void text(String title, String text, String mimeType) {
+  static void text(String title, String text, String mimeType, {Function(bool) handler}) {
     Map argsMap = <String, String>{
       'title': '$title',
       'text': '$text',
       'mimeType': '$mimeType'
     };
     _channel.invokeMethod('text', argsMap);
+    _eventChannel.receiveBroadcastStream().listen((v) {
+      handler(v);
+    });
   }
 
   /// Sends a file to other apps.
   static Future<void> file(
-      String title, String name, List<int> bytes, String mimeType, {String text = ''}) async {
+      String title, String name, List<int> bytes, String mimeType, {String text = '', Function(bool) handler}) async {
     Map argsMap = <String, String>{
       'title': '$title',
       'name': '$name',
@@ -33,11 +39,14 @@ class Share {
     await file.writeAsBytes(bytes);
 
     _channel.invokeMethod('file', argsMap);
+    _eventChannel.receiveBroadcastStream().listen((v) {
+      handler(v);
+    });
   }
 
   /// Sends multiple files to other apps.
   static Future<void> files(
-      String title, Map<String, List<int>> files, String mimeType, {String text = ''}) async {
+      String title, Map<String, List<int>> files, String mimeType, {String text = '', Function(bool) handler}) async {
     Map argsMap = <String, dynamic>{
       'title': '$title',
       'names': files.entries.toList().map((x) => x.key).toList(),
@@ -53,5 +62,8 @@ class Share {
     }
 
     _channel.invokeMethod('files', argsMap);
+    _eventChannel.receiveBroadcastStream().listen((v) {
+      handler(v);
+    });
   }
 }

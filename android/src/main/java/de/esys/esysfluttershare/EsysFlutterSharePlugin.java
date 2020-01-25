@@ -3,7 +3,7 @@ package de.esys.esysfluttershare;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
+import android.app.PendingIntent;
 
 import androidx.core.content.FileProvider;
 
@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -35,6 +36,9 @@ public class EsysFlutterSharePlugin implements MethodCallHandler {
     public static void registerWith(Registrar registrar) {
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "channel:github.com/orgs/esysberlin/esys-flutter-share");
         channel.setMethodCallHandler(new EsysFlutterSharePlugin(registrar));
+
+        final EventChannel eventChannel = new EventChannel(registrar.messenger(), "channel:github.com/orgs/esysberlin/esys-flutter-share-result");
+        eventChannel.setStreamHandler(new EsysFlutterShareReceiverPlugin());
     }
 
     @Override
@@ -62,7 +66,12 @@ public class EsysFlutterSharePlugin implements MethodCallHandler {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType(mimeType);
         shareIntent.putExtra(Intent.EXTRA_TEXT, text);
-        activeContext.startActivity(Intent.createChooser(shareIntent, title));
+
+        PendingIntent pi = PendingIntent.getBroadcast(activeContext, 0,
+            new Intent(activeContext, EsysFlutterShareReceiverPlugin.class),
+            PendingIntent.FLAG_UPDATE_CURRENT);
+
+        activeContext.startActivity(Intent.createChooser(shareIntent, title, pi.getIntentSender()));
     }
 
     private void file(Object arguments) {

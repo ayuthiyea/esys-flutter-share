@@ -11,5 +11,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/esys_flutter_share_filepaths" />
         </provider>
+        <receiver android:name="de.esys.esysfluttershare.EsysFlutterShareReceiverPlugin" android:exported="false"/>
     </application>
 </manifest>
