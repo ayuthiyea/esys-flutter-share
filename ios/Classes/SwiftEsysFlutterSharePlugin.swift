@@ -1,12 +1,17 @@
 import Flutter
 import UIKit
 
-public class SwiftEsysFlutterSharePlugin: NSObject, FlutterPlugin {
+public class SwiftEsysFlutterSharePlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
+    public var eventSink: FlutterEventSink?
+    
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "channel:github.com/orgs/esysberlin/esys-flutter-share", binaryMessenger: registrar.messenger())
         let instance = SwiftEsysFlutterSharePlugin()
         
         registrar.addMethodCallDelegate(instance, channel: channel)
+        
+        let eventChannel = FlutterEventChannel(name: "channel:github.com/orgs/esysberlin/esys-flutter-share-result", binaryMessenger: registrar.messenger())
+        eventChannel.setStreamHandler(instance)
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -19,6 +24,18 @@ public class SwiftEsysFlutterSharePlugin: NSObject, FlutterPlugin {
         if(call.method == "files"){
             self.files(arguments: call.arguments)
         }
+    }
+    
+    public func onListen(withArguments arguments: Any?, eventSink: @escaping FlutterEventSink) -> FlutterError? {
+        self.eventSink = eventSink
+        
+        return nil
+    }
+
+    public func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        self.eventSink = nil
+        
+        return nil;
     }
     
     func text(arguments:Any?) -> Void {
@@ -36,6 +53,19 @@ public class SwiftEsysFlutterSharePlugin: NSObject, FlutterPlugin {
         activityViewController.popoverPresentationController?.sourceView = controller.view
         
         controller.show(activityViewController, sender: self)
+        
+        //Completion handler
+        activityViewController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed: Bool, arrayReturnedItems: [Any]?, error: Error?) in
+            if completed {
+                if let eventSink = self.eventSink {
+                    return eventSink(true)
+                }
+            } else {
+                if let eventSink = self.eventSink {
+                    return eventSink(false)
+                }
+            }
+        }
     }
     
     func file(arguments:Any?) -> Void {

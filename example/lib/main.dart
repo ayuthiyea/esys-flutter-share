@@ -66,7 +66,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _shareText() async {
     try {
       Share.text('my text title',
-          'This is my text to share with other applications.', 'text/plain', handler: () {print("working");});
+          'This is my text to share with other applications.', 'text/plain', handler: (result) {
+            print("Content is already shared.");
+          });
     } catch (e) {
       print('error: $e');
     }
