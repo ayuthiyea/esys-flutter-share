@@ -92,7 +92,12 @@ public class EsysFlutterSharePlugin implements MethodCallHandler {
         shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
         // add optional text
         if (!text.isEmpty()) shareIntent.putExtra(Intent.EXTRA_TEXT, text);
-        activeContext.startActivity(Intent.createChooser(shareIntent, title));
+
+        PendingIntent pi = PendingIntent.getBroadcast(activeContext, 0,
+                new Intent(activeContext, EsysFlutterShareReceiverPlugin.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        activeContext.startActivity(Intent.createChooser(shareIntent, title, pi.getIntentSender()));
     }
 
     private void files(Object arguments) {
@@ -121,6 +126,11 @@ public class EsysFlutterSharePlugin implements MethodCallHandler {
         shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, contentUris);
         // add optional text
         if (!text.isEmpty()) shareIntent.putExtra(Intent.EXTRA_TEXT, text);
-        activeContext.startActivity(Intent.createChooser(shareIntent, title));
+
+        PendingIntent pi = PendingIntent.getBroadcast(activeContext, 0,
+                new Intent(activeContext, EsysFlutterShareReceiverPlugin.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        activeContext.startActivity(Intent.createChooser(shareIntent, title, pi.getIntentSender()));
     }
 }

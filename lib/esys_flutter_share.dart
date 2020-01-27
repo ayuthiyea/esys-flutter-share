@@ -19,8 +19,14 @@ class Share {
       'mimeType': '$mimeType'
     };
     _channel.invokeMethod('text', argsMap);
-    _eventChannel.receiveBroadcastStream().listen((v) {
-      handler(v);
+
+    StreamSubscription streamSubscription;
+    streamSubscription = _eventChannel.receiveBroadcastStream().listen((v) {
+      if (handler != null) {
+        handler(v);
+      }
+
+      streamSubscription.cancel();
     });
   }
 
@@ -39,8 +45,14 @@ class Share {
     await file.writeAsBytes(bytes);
 
     _channel.invokeMethod('file', argsMap);
-    _eventChannel.receiveBroadcastStream().listen((v) {
-      handler(v);
+
+    StreamSubscription<dynamic> streamSubscription;
+    streamSubscription = _eventChannel.receiveBroadcastStream().listen((v) {
+      if (handler != null) {
+        handler(v);
+      }
+
+      streamSubscription.cancel();
     });
   }
 
@@ -62,8 +74,14 @@ class Share {
     }
 
     _channel.invokeMethod('files', argsMap);
-    _eventChannel.receiveBroadcastStream().listen((v) {
-      handler(v);
+
+    StreamSubscription<dynamic> streamSubscription;
+    streamSubscription =  _eventChannel.receiveBroadcastStream().listen((v) {
+      if (handler != null) {
+        handler(v);
+      }
+
+      streamSubscription.cancel();
     });
   }
 }

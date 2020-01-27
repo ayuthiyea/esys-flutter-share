@@ -95,6 +95,19 @@ public class SwiftEsysFlutterSharePlugin: NSObject, FlutterPlugin, FlutterStream
         activityViewController.popoverPresentationController?.sourceView = controller.view
         
         controller.show(activityViewController, sender: self)
+        
+        //Completion handler
+       activityViewController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed: Bool, arrayReturnedItems: [Any]?, error: Error?) in
+           if completed {
+               if let eventSink = self.eventSink {
+                   return eventSink(true)
+               }
+           } else {
+               if let eventSink = self.eventSink {
+                   return eventSink(false)
+               }
+           }
+       }
     }
     
     func files(arguments:Any?) -> Void {
@@ -127,5 +140,18 @@ public class SwiftEsysFlutterSharePlugin: NSObject, FlutterPlugin, FlutterStream
         activityViewController.popoverPresentationController?.sourceView = controller.view
         
         controller.show(activityViewController, sender: self)
+        
+        //Completion handler
+       activityViewController.completionWithItemsHandler = { (activityType: UIActivity.ActivityType?, completed: Bool, arrayReturnedItems: [Any]?, error: Error?) in
+           if completed {
+               if let eventSink = self.eventSink {
+                   return eventSink(true)
+               }
+           } else {
+               if let eventSink = self.eventSink {
+                   return eventSink(false)
+               }
+           }
+       }
     }
 }
